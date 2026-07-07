@@ -30,4 +30,4 @@ html_code = HTML_PATH.read_text(encoding="utf-8")
 
 # index.html은 완전히 독립적인 HTML/CSS/JS(순수 프론트엔드)로 작성되어 있으므로
 # Streamlit 컴포넌트(iframe) 안에 그대로 렌더링합니다.
-components.html(html_code, height=1600, scrolling=True)
+components.html(html_code, height=1100, scrolling=False)

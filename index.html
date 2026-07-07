@@ -90,7 +90,6 @@
 
   .viewport-shell{
     display:flex;flex-direction:column;
-    min-height:100vh;
   }
 
   /* ---------- navbar ---------- */
@@ -887,6 +886,20 @@
   draftInput.placeholder = PLACEHOLDER[state.relation];
   updateToneLabel();
   updateSummary();
+
+  // Streamlit components.html iframe에 맞춰 실제 콘텐츠 높이로 자동 리사이즈
+  function resizeParentFrame(){
+    try {
+      var fe = window.frameElement;
+      if (fe) fe.style.height = document.documentElement.scrollHeight + 'px';
+    } catch(e){}
+  }
+  window.addEventListener('load', resizeParentFrame);
+  window.addEventListener('resize', resizeParentFrame);
+  if (window.ResizeObserver){
+    new ResizeObserver(resizeParentFrame).observe(document.body);
+  }
+  setTimeout(resizeParentFrame, 300);
 })();
 </script>
 </body>
