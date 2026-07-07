@@ -120,11 +120,12 @@
   .brand-sub{font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase;}
 
   .nav-links{display:flex;gap:clamp(18px,3vw,30px);justify-self:center;}
-  .nav-links a{
+  .nav-links a, .nav-links .nav-link-btn{
     font-size:0.92rem;font-weight:600;text-decoration:none;
     color:var(--text);opacity:0.75;transition:opacity .15s ease, color .15s ease;
+    background:none;border:none;padding:0;font-family:var(--font-kr);cursor:pointer;min-height:auto;
   }
-  .nav-links a:hover{opacity:1;color:var(--red);}
+  .nav-links a:hover, .nav-links .nav-link-btn:hover{opacity:1;color:var(--red);}
   @media (max-width:880px){ .nav-links{display:none;} }
 
   .nav-actions{display:flex;align-items:center;gap:12px;}
@@ -469,7 +470,7 @@
         <a href="#">요금</a>
         <a href="#">블로그</a>
         <a href="#">문의</a>
-        <a href="#" id="entertainmentToggle">엔터테인먼트</a>
+        <button type="button" class="nav-link-btn" id="entertainmentToggle">엔터테인먼트</button>
       </nav>
 
       <div class="nav-actions">
@@ -693,8 +694,7 @@
     updateSummary();
   });
 
-  entertainmentToggle.addEventListener('click', function(e){
-    e.preventDefault();
+  entertainmentToggle.addEventListener('click', function(){
     state.entertainment = !state.entertainment;
     document.body.classList.toggle('entertainment-mode', state.entertainment);
     entertainmentToggle.textContent = state.entertainment ? '일반 모드' : '엔터테인먼트';
