@@ -825,7 +825,74 @@
     return s;
   }
 
+  function polishGenZ(text){
+    var s = text.trim();
+    var subs = [
+      [/정말로?|진짜로?/g, 'ㄹㅇ'],
+      [/알겠습니다|알겠어요|알겠어|알았어요?/g, 'ㅇㅋㅇㅋㅇㅋ'],
+      [/맞습니다|맞아요|맞아/g, 'ㅇㅈ'],
+      [/대박|최고예요?|최고입니다/g, '개대박'],
+      [/화나요?|짜증나요?|열받아요?/g, '킹받네'],
+      [/미안해요?|죄송합니다|죄송해요/g, '아 미안 ㅋㅋ'],
+      [/좋아요|좋습니다/g, '개꿀'],
+      [/힘들어요?|힘듭니다/g, '현타옴'],
+      [/모르겠어요?|모르겠습니다/g, '나도 모르겠음 ㄹㅇ'],
+      [/부끄러워요?|창피해요?/g, '갑분싸'],
+      [/당황했어요?|당황스러워요?/g, '뇌절'],
+      [/해줘요?|해주세요/g, '해줘라 진짜'],
+      [/그거|저거/g, '그거 flex'],
+      [/합니다|해요/g, '함'],
+      [/입니다|이에요|예요/g, '임']
+    ];
+    subs.forEach(function(r){ s = s.replace(r[0], r[1]); });
+    s = s.replace(/[.]+/g, ' ㅋㅋ').replace(/!+/g, ' ㄹㅇ!').replace(/\?+/g, '? 인정?');
+    s = s.replace(/\s+/g, ' ').trim();
+    if (!/(ㅋ|ㅇㅈ|!|\?)$/.test(s)) s += ' ㄹㅇ';
+    return s;
+  }
+
+  function polishGaru(text){
+    var s = text.trim().replace(/[.!?]+$/g, '');
+    var endings = [
+      [/습니다$/, '스무니다'], [/합니다$/, '하무니다'], [/됩니다$/, '되무니다'],
+      [/있습니다$/, '있스무니다'], [/없습니다$/, '없스무니다'],
+      [/해요$/, '하무니다'], [/이에요$/, '이무니다'], [/예요$/, '무니다'],
+      [/어요$/, '어무니다'], [/아요$/, '아무니다']
+    ];
+    var matched = false;
+    for (var i = 0; i < endings.length; i++){
+      if (endings[i][0].test(s)){ s = s.replace(endings[i][0], endings[i][1]); matched = true; break; }
+    }
+    if (!matched) s += '이무니다';
+    s = '저는 사람이 아니무니다, 갸루상이무니다^^ ' + s + '^^';
+    return s;
+  }
+
+  function polishY2K(text){
+    var s = text.trim().replace(/[.!?]+$/g, '');
+    var endings = [
+      [/습니다$/, '슴당~'], [/합니다$/, '해용~'], [/해요$/, '해용~'],
+      [/이에요$/, '이에용~'], [/예요$/, '예용~'],
+      [/어요$/, '어용~'], [/아요$/, '아용~']
+    ];
+    var matched = false;
+    for (var i = 0; i < endings.length; i++){
+      if (endings[i][0].test(s)){ s = s.replace(endings[i][0], endings[i][1]); matched = true; break; }
+    }
+    if (!matched) s += '이자나~';
+    s = s.replace(/잖아요?/g, '자나');
+    s += ' ㅠㅠ 완전 대박이자나 (｡･∀･)ﾉﾞ☆';
+    return s;
+  }
+
+  function polishConcept(text, concept){
+    if (concept === 'genz') return polishGenZ(text);
+    if (concept === 'garu') return polishGaru(text);
+    return polishY2K(text);
+  }
+
   function polish(text){
+    if (state.entertainment) return polishConcept(text, state.concept);
     if (state.relation === 'global') return polishGlobal(text, state.formality, state.firm);
     return polishKorean(text, state.formality, state.firm);
   }
