@@ -14,10 +14,11 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-        #MainMenu {visibility: hidden;}
-        header {visibility: hidden;}
-        footer {visibility: hidden;}
-        div.block-container {padding: 0 !important; max-width: 100% !important;}
+        #MainMenu {display: none;}
+        header {display: none;}
+        footer {display: none;}
+        div.block-container {padding: 0 !important; margin: 0 !important; max-width: 100% !important;}
+        [data-testid="stAppViewContainer"] {padding-top: 0 !important;}
         iframe {display: block;}
     </style>
     """,
