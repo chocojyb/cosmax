@@ -248,6 +248,35 @@
   .quote-card-head p{margin:0;color:var(--text-muted);font-size:0.86rem;}
 
   .quote-field{display:flex;flex-direction:column;gap:8px;}
+  .field-concept{display:none;}
+
+  /* ---------- entertainment mode ---------- */
+  @keyframes rainbowShift{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+  }
+  body.entertainment-mode{
+    background:linear-gradient(120deg,#ff9a9e,#fad0c4,#fbc2eb,#a6c1ee,#84fab0,#8fd3f4,#fddb92,#ff9a9e);
+    background-size:400% 400%;
+    animation:rainbowShift 16s ease infinite;
+  }
+  @media (prefers-reduced-motion: reduce){ body.entertainment-mode{animation:none;} }
+  body.entertainment-mode .hero{
+    background:
+      radial-gradient(720px 420px at 88% -8%, rgba(255,255,255,0.4) 0%, transparent 62%),
+      radial-gradient(640px 380px at -6% 8%, rgba(255,255,255,0.3) 0%, transparent 60%);
+  }
+  body.entertainment-mode .field-relation,
+  body.entertainment-mode .field-tone,
+  body.entertainment-mode .field-firm,
+  body.entertainment-mode .field-diffactions,
+  body.entertainment-mode #diffDetail{
+    display:none;
+  }
+  body.entertainment-mode .field-concept{
+    display:flex;
+  }
   .field-label{
     font-size:0.72rem;font-weight:700;letter-spacing:0.06em;
     color:var(--text-muted);text-transform:uppercase;
@@ -440,7 +469,7 @@
         <a href="#">요금</a>
         <a href="#">블로그</a>
         <a href="#">문의</a>
-        <a href="entertainment.html" target="_blank" rel="noopener">엔터테인먼트</a>
+        <a href="#" id="entertainmentToggle">엔터테인먼트</a>
       </nav>
 
       <div class="nav-actions">
@@ -503,7 +532,7 @@
             <textarea id="draftInput" rows="4" placeholder="팀장님 저 그거 아직 못했는데 내일까지 하면 될까요?"></textarea>
           </div>
 
-          <div class="quote-field">
+          <div class="quote-field field-relation">
             <label class="field-label" for="relationSelect">받는 사람</label>
             <div class="select-wrap">
               <select id="relationSelect">
@@ -518,7 +547,21 @@
             </div>
           </div>
 
-          <div class="quote-field">
+          <div class="quote-field field-concept">
+            <label class="field-label" for="conceptSelect">컨셉</label>
+            <div class="select-wrap">
+              <select id="conceptSelect">
+                <option value="y2k">Y2K</option>
+                <option value="genz">Gen-Z</option>
+                <option value="garu">갸루</option>
+              </select>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M3 5L7 9L11 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="quote-field field-tone">
             <div class="tone-header">
               <span class="field-label" id="toneLabel">톤 강도</span>
               <span class="tone-value" id="toneValue">정중하게 70%</span>
@@ -531,7 +574,7 @@
             </div>
           </div>
 
-          <div class="quote-field">
+          <div class="quote-field field-firm">
             <span class="field-label" id="firmLabel">어투</span>
             <div class="segmented" id="firmSegment" role="group" aria-labelledby="firmLabel">
               <button type="button" class="active" data-firm="false">부드럽게</button>
@@ -542,7 +585,7 @@
           <div class="result-box" id="resultBox">
             <span class="result-box-label" id="summaryChip">직속 상사께 · 정중하게 70% · 단호함 OFF</span>
             <p class="result-box-text is-placeholder" id="resultBoxText">원문을 입력하고 다듬기를 눌러보세요.</p>
-            <div class="result-box-actions">
+            <div class="result-box-actions field-diffactions" id="resultActions">
             <button type="button" class="diff-toggle" id="diffToggle" hidden>원문과 비교하기</button>
             <button type="button" class="copy-button" id="copyButton" hidden>
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="4" y="4" width="8" height="8" rx="1.4" stroke="currentColor" stroke-width="1.3"/><path d="M2.5 9.5V2.5C2.5 2 2.9 1.6 3.4 1.6H9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
@@ -586,9 +629,10 @@
 
 <script>
 (function(){
-  var state = { relation:'boss', formality:70, firm:false };
+  var state = { relation:'boss', formality:70, firm:false, concept:'y2k', entertainment:false };
 
   var RELATION_LABEL = { boss:'직속 상사', exec:'임원', dept:'타 부서 담당자', global:'해외 지사 담당자' };
+  var CONCEPT_LABEL = { y2k:'Y2K', genz:'Gen-Z', garu:'갸루' };
   var PLACEHOLDER = {
     boss:'팀장님 저 그거 아직 못했는데 내일까지 하면 될까요?',
     exec:'이사님 그 보고서 관련해서 제 생각엔 이렇게 하면 좋을 거 같아요',
@@ -597,6 +641,7 @@
   };
 
   var relationSelect = document.getElementById('relationSelect');
+  var conceptSelect = document.getElementById('conceptSelect');
   var draftInput = document.getElementById('draftInput');
   var toneSlider = document.getElementById('toneSlider');
   var toneValue = document.getElementById('toneValue');
@@ -616,6 +661,7 @@
   var iconSun = document.getElementById('iconSun');
   var navCta = document.getElementById('navCta');
   var heroCta = document.getElementById('heroCta');
+  var entertainmentToggle = document.getElementById('entertainmentToggle');
 
   function toneWord(v){
     if (v >= 55) return '정중하게';
@@ -628,6 +674,10 @@
   }
 
   function updateSummary(){
+    if (state.entertainment){
+      summaryChip.textContent = CONCEPT_LABEL[state.concept] + ' 컨셉으로 다듬는 중';
+      return;
+    }
     summaryChip.textContent = RELATION_LABEL[state.relation] + '께 · ' + toneWord(state.formality) +
       ' ' + state.formality + '% · 단호함 ' + (state.firm ? 'ON' : 'OFF');
   }
@@ -636,6 +686,23 @@
     state.relation = relationSelect.value;
     draftInput.placeholder = PLACEHOLDER[state.relation];
     updateSummary();
+  });
+
+  conceptSelect.addEventListener('change', function(){
+    state.concept = conceptSelect.value;
+    updateSummary();
+  });
+
+  entertainmentToggle.addEventListener('click', function(e){
+    e.preventDefault();
+    state.entertainment = !state.entertainment;
+    document.body.classList.toggle('entertainment-mode', state.entertainment);
+    entertainmentToggle.textContent = state.entertainment ? '일반 모드' : '엔터테인먼트';
+    diffDetail.setAttribute('hidden', 'true');
+    diffToggle.setAttribute('hidden', 'true');
+    diffToggle.textContent = '원문과 비교하기';
+    updateSummary();
+    syncLayout();
   });
 
   toneSlider.addEventListener('input', function(){
