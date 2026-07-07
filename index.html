@@ -150,6 +150,7 @@
   /* ---------- hero ---------- */
   .hero{
     flex:1 0 auto;
+    min-height:620px;
     display:flex;position:relative;
     background:
       radial-gradient(720px 420px at 88% -8%, var(--green-soft) 0%, transparent 62%),
@@ -652,37 +653,11 @@
     updateSummary();
   });
 
-  function easeInOutQuad(t){
-    return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-  }
-
-  function smoothScrollTo(targetY, duration){
-    var startY = window.scrollY;
-    var diff = targetY - startY;
-    var startTime = null;
-
-    function step(timestamp){
-      if (startTime === null) startTime = timestamp;
-      var elapsed = timestamp - startTime;
-      var progress = Math.min(elapsed / duration, 1);
-      window.scrollTo(0, startY + diff * easeInOutQuad(progress));
-      if (progress < 1) requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
-  }
-
   function scrollToTool(){
     var card = document.getElementById('quoteCard');
-    var rect = card.getBoundingClientRect();
-    var targetY = window.scrollY + rect.top;
     var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduceMotion){
-      window.scrollTo(0, Math.max(targetY, 0));
-      draftInput.focus();
-    } else {
-      smoothScrollTo(Math.max(targetY, 0), 900);
-      setTimeout(function(){ draftInput.focus(); }, 950);
-    }
+    card.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    setTimeout(function(){ draftInput.focus(); }, reduceMotion ? 0 : 500);
   }
   navCta.addEventListener('click', scrollToTool);
   heroCta.addEventListener('click', scrollToTool);
@@ -887,6 +862,22 @@
   updateToneLabel();
   updateSummary();
 
+  // 실제 브라우저 뷰포트 높이만큼 hero를 채워서, 처음 진입 시 입력 칸(quoteCard)이
+  // 스크롤 없이는 보이지 않도록 함
+  var heroEl = document.querySelector('.hero');
+  var navbarEl = document.querySelector('.navbar');
+  function setHeroMinHeight(){
+    if (!heroEl) return;
+    var vh = window.innerHeight;
+    try {
+      if (window.top && window.top !== window && window.top.innerHeight) {
+        vh = window.top.innerHeight;
+      }
+    } catch(e){}
+    var navH = navbarEl ? navbarEl.offsetHeight : 0;
+    heroEl.style.minHeight = Math.max(vh - navH, 480) + 'px';
+  }
+
   // Streamlit components.html iframe에 맞춰 실제 콘텐츠 높이로 자동 리사이즈
   function resizeParentFrame(){
     try {
@@ -894,12 +885,18 @@
       if (fe) fe.style.height = document.documentElement.scrollHeight + 'px';
     } catch(e){}
   }
-  window.addEventListener('load', resizeParentFrame);
-  window.addEventListener('resize', resizeParentFrame);
+
+  function syncLayout(){
+    setHeroMinHeight();
+    resizeParentFrame();
+  }
+
+  window.addEventListener('load', syncLayout);
+  window.addEventListener('resize', syncLayout);
   if (window.ResizeObserver){
     new ResizeObserver(resizeParentFrame).observe(document.body);
   }
-  setTimeout(resizeParentFrame, 300);
+  setTimeout(syncLayout, 300);
 })();
 </script>
 </body>
